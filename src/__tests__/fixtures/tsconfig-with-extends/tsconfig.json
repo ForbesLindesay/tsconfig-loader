@@ -1,0 +1,4 @@
+{
+  "extends": "./base/base-config.json",
+  "compilerOptions": {"baseUrl": "kalle"}
+}
