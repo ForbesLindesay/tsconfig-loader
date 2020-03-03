@@ -1,5 +1,7 @@
 # tsconfig-loader
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/ForbesLindesay/tsconfig-loader.svg)](https://greenkeeper.io/)
+
 Load tsconfig, respecting `TS_NODE_PROJECT` env var and `"extends"`
 
 ## Installation
