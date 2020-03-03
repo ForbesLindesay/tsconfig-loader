@@ -5,6 +5,7 @@ import * as fs from 'fs';
 import deepmerge = require('deepmerge');
 import JSON5 = require('json5');
 import StripBom = require('strip-bom');
+import {sync as resolve} from 'resolve';
 import {JSONSchemaForTheTypeScriptCompilerSConfigurationFile} from './tsconfig';
 
 export type Tsconfig = JSONSchemaForTheTypeScriptCompilerSConfigurationFile;
@@ -84,20 +85,24 @@ function loadTsconfigFile(configFilePath: string): Tsconfig | undefined {
   let extendedConfig = config.extends;
 
   if (extendedConfig) {
-    if (extendedConfig.indexOf('.json') === -1) {
-      extendedConfig += '.json';
-    }
-
     const currentDir = path.dirname(configFilePath);
-    const base = loadTsconfigFile(path.join(currentDir, extendedConfig)) || {};
+    extendedConfig = resolve(extendedConfig, {
+      basedir: currentDir,
+      extensions: ['.json'],
+      packageFilter: (pkg) => {
+        pkg.main = 'tsconfig.json';
+        return pkg;
+      },
+    });
+    const base = loadTsconfigFile(extendedConfig) || {};
 
     // baseUrl should be interpreted as relative to the base tsconfig,
     // but we need to update it so it is relative to the original tsconfig being loaded
     if (base && base.compilerOptions && base.compilerOptions.baseUrl) {
       const extendsDir = path.dirname(extendedConfig);
-      base.compilerOptions.baseUrl = path.join(
-        extendsDir,
-        base.compilerOptions.baseUrl,
+      base.compilerOptions.baseUrl = path.relative(
+        path.dirname(configFilePath),
+        path.join(extendsDir, base.compilerOptions.baseUrl),
       );
     }
 
