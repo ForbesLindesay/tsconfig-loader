@@ -88,4 +88,12 @@ describe('tsconfig-loader', () => {
       }
     `);
   });
+  it('should extend npm packages', () => {
+    const result = loadTsconfig({
+      cwd: `${__dirname}/fixtures/tsconfig-with-extends-npm`,
+    });
+    expect(result?.tsConfig.compilerOptions).toEqual(
+      require('@forbeslindesay/tsconfig/tsconfig.json').compilerOptions,
+    );
+  });
 });
